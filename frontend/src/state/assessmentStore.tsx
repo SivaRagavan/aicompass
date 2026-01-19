@@ -4,7 +4,9 @@ export type AssessmentProfile = {
   companyName: string
   industry: string
   size: string
-  notes: string
+  execName: string
+  execTitle: string
+  execEmail: string
 }
 
 export type MetricSelection = {
@@ -17,7 +19,8 @@ export type MetricScore = {
   metricId: string
   pillarId: string
   score: number
-  notes: string
+  responses: number[]
+  completed: boolean
 }
 
 export type AssessmentState = {
@@ -30,7 +33,9 @@ const defaultProfile: AssessmentProfile = {
   companyName: '',
   industry: '',
   size: '',
-  notes: '',
+  execName: '',
+  execTitle: '',
+  execEmail: '',
 }
 
 const defaultState: AssessmentState = {
@@ -72,6 +77,9 @@ export const AssessmentProvider = ({
 
   const resetAssessment = () => {
     setAssessment(defaultState)
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('inviteToken')
+    }
   }
 
   const value = useMemo(

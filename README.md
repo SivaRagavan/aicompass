@@ -1,28 +1,31 @@
-# AI Adoption Benchmark
+# AI Compass
 
-A Bun + React app to assess a single company’s AI adoption journey using a modular, editable benchmark. The flow starts with guided questions to select relevant modules, then scores metrics on a five-point scale with notes.
+AI Compass is a Bun + React frontend with a Bun + Mongo backend that lets PE firms create AI readiness assessments for portfolio companies. Executives receive an invite link, enter their details, and complete the assessment with autosave progress tracking.
 
 ## Features
 
-- Guided questions to select applicable pillars and metrics
-- Slider-based scoring with labeled anchors and notes per metric
-- Composite score, pillar scores, and maturity band
-- Benchmark editor for pillars, metrics, weights, and slider labels
-- Basic results visualization (bar chart)
+- PE firm login with email + password
+- Portfolio assessment creation with expiring invite links
+- Executive assessment flow with autosave + resume
+- Progress tracking and results summary
 
 ## Local Development
 
 ```bash
+cd frontend
 bun install
-bun dev
+bun run dev
 ```
 
-The app runs on `0.0.0.0:5173` and allows `http://alien:5173` as a host.
+```bash
+cd backend/app
+bun install
+bun run dev
+```
+
+Frontend runs on `0.0.0.0:8001` and backend on `0.0.0.0:4001`.
 
 ## Project Structure
 
-- `src/routes` — Home, Questions, Assessment, Results, Benchmark Editor
-- `src/data` — Benchmark schema and guided questions
-- `src/state` — Benchmark and assessment state stores
-- `src/utils` — Scoring utilities
-- `src/components/ui` — shadcn/ui components
+- `frontend/src` — React app and assessment flow
+- `backend/app/src` — Bun API (auth + assessment endpoints)

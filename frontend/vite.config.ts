@@ -12,6 +12,7 @@ export default defineConfig({
   },
   server: {
     host: '0.0.0.0',
-    allowedHosts: ['alien'],
+    port: 8001,
+    allowedHosts: ['alien', 'aicompass.co'],
   },
 })

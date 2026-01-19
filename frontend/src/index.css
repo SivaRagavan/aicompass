@@ -9,6 +9,12 @@
   .slider-label {
     @apply absolute -translate-x-1/2 text-xs text-muted-foreground;
   }
+  .slider-label:first-child {
+    @apply translate-x-0;
+  }
+  .slider-label:last-child {
+    @apply -translate-x-full;
+  }
 }
 
 @layer base {

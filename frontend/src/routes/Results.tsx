@@ -1,12 +1,14 @@
-import { useMemo } from 'react'
-import { Link } from 'react-router-dom'
+import { useEffect, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import { useBenchmark } from '../state/benchmarkStore'
 import { useAssessment } from '../state/assessmentStore'
 import { calculateScores } from '../utils/scoring'
+
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { apiClient } from '@/lib/api'
 import {
   Table,
   TableBody,
@@ -17,13 +19,29 @@ import {
 } from '@/components/ui/table'
 
 const Results = () => {
+  const navigate = useNavigate()
   const { benchmark } = useBenchmark()
-  const { assessment } = useAssessment()
+  const { assessment, resetAssessment } = useAssessment()
 
   const summary = useMemo(
     () => calculateScores(benchmark, assessment.selections, assessment.scores),
     [benchmark, assessment],
   )
+
+  useEffect(() => {
+    if (!sessionStorage.getItem('inviteToken')) return
+    const inviteToken = sessionStorage.getItem('inviteToken')
+    void apiClient.patch(`/api/invite/${inviteToken}`, {
+      scores: assessment.scores,
+      progress: {
+        completedMetrics: assessment.scores.length,
+        totalMetrics: assessment.scores.length,
+        percent: 100,
+        updatedAt: new Date().toISOString(),
+      },
+      status: 'completed',
+    })
+  }, [assessment.scores])
 
   return (
     <Card>
@@ -64,13 +82,13 @@ const Results = () => {
         </div>
 
         <div className="space-y-3">
-          <h3 className="text-lg font-semibold">Metric Notes</h3>
+          <h3 className="text-lg font-semibold">Metric Scores</h3>
           <Table>
             <TableHeader>
               <TableRow>
                 <TableHead>Metric</TableHead>
                 <TableHead>Score</TableHead>
-                <TableHead>Notes</TableHead>
+                <TableHead>Question Count</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -79,11 +97,13 @@ const Results = () => {
                   (item) => item.id === score.pillarId,
                 )
                 const metric = pillar?.metrics.find((item) => item.id === score.metricId)
+                const average = score.score
+                const questionCount = metric?.questions.length ?? score.responses?.length ?? 0
                 return (
                   <TableRow key={score.metricId}>
                     <TableCell>{metric?.name ?? score.metricId}</TableCell>
-                    <TableCell>{score.score}</TableCell>
-                    <TableCell>{score.notes || '-'}</TableCell>
+                    <TableCell>{average.toFixed(1)}</TableCell>
+                    <TableCell>{questionCount} questions</TableCell>
                   </TableRow>
                 )
               })}
@@ -92,11 +112,17 @@ const Results = () => {
         </div>
       </CardContent>
       <div className="flex flex-wrap gap-3 px-6 pb-6">
-        <Button asChild variant="secondary">
-          <Link to="/assessment">Back to Scoring</Link>
+        <Button variant="secondary" onClick={() => navigate('/modules')}>
+          Back to Modules
         </Button>
-        <Button asChild variant="outline">
-          <Link to="/">Start New Assessment</Link>
+        <Button
+          variant="outline"
+          onClick={() => {
+            resetAssessment()
+            navigate('/')
+          }}
+        >
+          Reset Assessment
         </Button>
       </div>
     </Card>
