@@ -18,7 +18,7 @@ bun run dev
 ```
 
 ```bash
-cd backend/app
+cd backend
 bun install
 bun run dev
 ```
@@ -28,4 +28,4 @@ Frontend runs on `0.0.0.0:8001` and backend on `0.0.0.0:4001`.
 ## Project Structure
 
 - `frontend/src` — React app and assessment flow
-- `backend/app/src` — Bun API (auth + assessment endpoints)
+- `backend/src` — Bun API (auth + assessment endpoints)
