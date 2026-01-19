@@ -23,29 +23,41 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const refresh = async () => {
     setIsLoading(true)
-    const response = await apiClient.get<{ user: User | null }>('/api/auth/me')
-    if (response.data) {
-      setUser(response.data.user)
+    const response = await apiClient.get<User | null>('/api/auth/me')
+    if (response.data !== undefined) {
+      setUser(response.data)
     }
     setIsLoading(false)
   }
 
   const login = async (email: string, password: string) => {
-    const response = await apiClient.post<User>('/api/auth/login', { email, password })
+    const response = await apiClient.post<{ user: User; token: string }>(
+      '/api/auth/login',
+      { email, password },
+    )
     if (response.error) return response.error
+    if (response.data?.token) {
+      localStorage.setItem('authToken', response.data.token)
+    }
     await refresh()
     return null
   }
 
   const register = async (email: string, password: string) => {
-    const response = await apiClient.post<User>('/api/auth/register', { email, password })
+    const response = await apiClient.post<{ user: User; token: string }>(
+      '/api/auth/register',
+      { email, password },
+    )
     if (response.error) return response.error
+    if (response.data?.token) {
+      localStorage.setItem('authToken', response.data.token)
+    }
     await refresh()
     return null
   }
 
   const logout = async () => {
-    await apiClient.post('/api/auth/logout')
+    localStorage.removeItem('authToken')
     setUser(null)
   }
 
